@@ -10,8 +10,9 @@ import (
 
 var plog = capnslog.NewPackageLogger("github.com/ainoya/fune", "funemain")
 
+// Main sets up fune agent
 func Main() {
-	cfg := NewConfig()
+	cfg := newConfig()
 	err := cfg.Parse(os.Args[1:])
 	if err != nil {
 		plog.Errorf("error verifying flags, %v. See 'fune --help'.", err)

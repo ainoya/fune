@@ -8,5 +8,4 @@ Features/goals of the integration tests:
 3. based on goroutines, which is faster than process.
 4. mainly tests user behavior and user-facing API.
 */
-
 package integration

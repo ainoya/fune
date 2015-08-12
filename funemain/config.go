@@ -13,7 +13,8 @@ type config struct {
 	logPkgLevels string
 }
 
-func NewConfig() *config {
+//newConfig initializes config struct
+func newConfig() *config {
 	cfg := &config{}
 
 	cfg.FlagSet = flag.NewFlagSet("etcd", flag.ContinueOnError)
