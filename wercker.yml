@@ -1,0 +1,32 @@
+box: google/golang
+
+build:
+  steps:
+    - setup-go-workspace
+    - script:
+        name: get godep, golint
+        code: |-
+            go get github.com/tools/godep
+            go get github.com/golang/lint/golint
+    - script:
+        name: resolve dependency
+        code: |-
+            godep restore
+    - script:
+        name: golint check
+        code: |-
+            if [ -n "$WERCKER_GOLINT_EXCLUDE" ]; then
+              LINTLINES=$(golint ./... | grep -ve "$WERCKER_GOLINT_EXCLUDE" | tee lint_results.txt | wc -l | tr -d " ")
+            else
+              LINTLINES=$(golint ./... | tee lint_results.txt | wc -l | tr -d " ")
+            fi
+
+            cat lint_results.txt
+            if [ "$LINTLINES" -ge 30 ]; then echo "Time to tidy up: $LINTLINES lint warnings." > "$WERCKER_REPORT_MESSAGE_FILE"; fail "Time to tidy up."; fi
+            if [ "$LINTLINES" -ge 5 ]; then echo "You should be tidying soon: $LINTLINES lint warnings." > "$WERCKER_REPORT_MESSAGE_FILE"; warn "You should be tidying soon."; fi
+            if [ "$LINTLINES" -gt 0 ]; then echo "You are fairly tidy: $LINTLINES lint warnings." > "$WERCKER_REPORT_MESSAGE_FILE"; fi
+    - script:
+        name: run test
+        code: |-
+            ./test
+
