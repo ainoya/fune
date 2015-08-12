@@ -6,6 +6,7 @@ import (
 
 var plog = capnslog.NewPackageLogger("github.com/ainoya/fune", "funeagent")
 
+// FuneAgent is the agent implementation
 type FuneAgent struct {
 	cfg *AgentConfig
 
@@ -29,22 +30,23 @@ func NewAgent(cfg *AgentConfig) (*FuneAgent, error) {
 // Start prepares and starts agent in a new goroutine. It is no longer safe to
 // modify a agent's fields after it has been sent to Start.
 // It also starts a goroutine to publish its agent information.
-func (s *FuneAgent) Start() {
-	s.start()
+func (a *FuneAgent) Start() {
+	a.start()
 	//TODO :  goroutine to publish its agent infromation
 }
 
 // Stop stops the agent gracefully, and shuts down the running goroutine.
 // Stop should be called after a Start(s), otherwise it will block forever.
-func (s *FuneAgent) Stop() {
+func (a *FuneAgent) Stop() {
 	select {
-	case s.stop <- struct{}{}:
-	case <-s.done:
+	case a.stop <- struct{}{}:
+	case <-a.done:
 		return
 	}
-	<-s.done
+	<-a.done
 }
 
+// start is called by Start() function internally.
 func (a *FuneAgent) start() {
 	a.done = make(chan struct{})
 	a.stop = make(chan struct{})
@@ -71,4 +73,4 @@ func (a *FuneAgent) run() {
 
 // StopNotify returns a channel that receives a empty struct
 // when the server is stopped.
-func (s *FuneAgent) StopNotify() <-chan struct{} { return s.done }
+func (a *FuneAgent) StopNotify() <-chan struct{} { return a.done }
