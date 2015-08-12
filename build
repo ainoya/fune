@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+ORG_PATH="github.com/ainoya"
+REPO_PATH="${ORG_PATH}/fune"
+
+export GOPATH=${PWD}/gopath
+
+rm -f $GOPATH/src/${REPO_PATH}
+mkdir -p $GOPATH/src/${ORG_PATH}
+ln -s ${PWD} $GOPATH/src/${REPO_PATH}
+
+eval $(go env)
+
+GIT_SHA=`git rev-parse --short HEAD || echo "GitNotFound"`
+
+# Static compilation is useful when etcd is run in a container
+CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-s -X ${REPO_PATH}/version.GitSHA ${GIT_SHA}" -o bin/fune-agent ${REPO_PATH}

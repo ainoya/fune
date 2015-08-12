@@ -1,0 +1,23 @@
+{
+	"ImportPath": "github.com/ainoya/fune",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/osutil",
+			"Comment": "v2.1.1-142-g042afcf",
+			"Rev": "042afcf2a32d985542fc3735ea5cd46931419a8a"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-systemd/journal",
+			"Comment": "v3-6-gcea488b",
+			"Rev": "cea488b4e6855fee89b6c22a811e3c5baca861b6"
+		},
+		{
+			"ImportPath": "github.com/coreos/pkg/capnslog",
+			"Rev": "b0d3d81732aea341039d191d8618a3466fe54395"
+		}
+	]
+}

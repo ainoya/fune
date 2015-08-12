@@ -1,0 +1,6 @@
+/coverage
+/gopath
+/bin
+.vagrant
+*.swp
+*.test
