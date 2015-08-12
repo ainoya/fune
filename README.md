@@ -1,6 +1,8 @@
 Fune
 ==========
 
+[![wercker status](https://app.wercker.com/status/ffc850729c83561933ed7651a25634b7/m "wercker status")](https://app.wercker.com/project/bykey/ffc850729c83561933ed7651a25634b7)
+
 An Event emitting agent triggered by docker daemon
 
 Overview
