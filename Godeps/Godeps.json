@@ -18,6 +18,15 @@
 		{
 			"ImportPath": "github.com/coreos/pkg/capnslog",
 			"Rev": "b0d3d81732aea341039d191d8618a3466fe54395"
+		},
+		{
+			"ImportPath": "github.com/fsouza/go-dockerclient",
+			"Rev": "cadf1f84dcd33b7c0118ef5336263d0a0ae2eecf"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-21-gf552045",
+			"Rev": "f5520455607c0233cb6d7b056f71b22c1d265ef1"
 		}
 	]
 }
