@@ -13,16 +13,16 @@ func (a *actionStdOut) Ch() chan interface{} {
 	return a.ch
 }
 
-func (a *actionStdOut) on() {
-	for {
-		select {
-		case event := <-a.Ch():
-			fmt.Printf("new event received: %s %s %s %s",
-				event.(docker.APIEvents).Status,
-				event.(docker.APIEvents).ID,
-				event.(docker.APIEvents).From,
-				event.(docker.APIEvents).Time,
-			)
-		}
+func (a *actionStdOut) On() func(event interface{}) {
+
+	f := func(e interface{}) {
+		fmt.Printf("new event received: %s %s %s %s",
+			e.(docker.APIEvents).Status,
+			e.(docker.APIEvents).ID,
+			e.(docker.APIEvents).From,
+			e.(docker.APIEvents).Time,
+		)
 	}
+
+	return f
 }

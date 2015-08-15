@@ -43,7 +43,7 @@ func TestBroadCast(t *testing.T) {
 			case e, ok := <-a.Ch():
 				if ok {
 					assert.Equal(t, e, msg, "received broadcasted message")
-					count += 1
+					count++
 				}
 			}
 		}(i)
