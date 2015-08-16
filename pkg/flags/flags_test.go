@@ -11,9 +11,7 @@ func TestEnabledActionsFromFlags(t *testing.T) {
 	fs := flag.NewFlagSet("test", flag.PanicOnError)
 	fs.Var(NewActionNames(), "actions", "")
 
-	if err := fs.Parse(args); err != nil {
-		t.Errorf("#%d: failed to parse flags: %v", err)
-	}
+	fs.Parse(args)
 
 	enabledActions, _ := EnabledActionsFromFlags(fs, "actions")
 

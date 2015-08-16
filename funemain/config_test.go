@@ -2,7 +2,6 @@ package funemain
 
 import (
 	"github.com/ainoya/fune/Godeps/_workspace/src/github.com/stretchr/testify/assert"
-	"github.com/ainoya/fune/pkg"
 	"testing"
 )
 
@@ -24,5 +23,4 @@ func TestParseEnabledActions(t *testing.T) {
 	config.Parse(args)
 
 	assert.Equal(t, config.enabledActions[0], "a")
-	assert.Equal(t, config.enabledActions, flags.ActionNames{"a", "b", "c"})
 }

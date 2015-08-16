@@ -1,16 +1,8 @@
-box: google/golang
+box: google/golang:1.4
 
 build:
   steps:
     - setup-go-workspace
-    - script:
-        name: get godep
-        code: |-
-            go get github.com/tools/godep
-    - script:
-        name: resolve dependency
-        code: |-
-            godep restore
     - golint
     - script:
         name: run test

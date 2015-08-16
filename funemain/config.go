@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ainoya/fune/actions"
-	"github.com/ainoya/fune/pkg"
+	"github.com/ainoya/fune/pkg/flags"
 	"os"
 )
 
