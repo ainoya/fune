@@ -9,6 +9,7 @@ type Action interface {
 	Name() string
 	On() func(interface{})
 	Ch() chan interface{}
+	Prepare()
 }
 
 // ActionAddress is information of actions
@@ -116,6 +117,7 @@ func ReadAllConfigKeys(label string) [](*ConfigUnit) {
 // RegisterAction registers defined action to `actions` list.
 func RegisterAction(addr *ActionAddress) {
 	a := addr.NewFunc()
+	a.Prepare()
 	actions[a.Name()] = a
 }
 
