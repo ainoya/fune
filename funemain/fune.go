@@ -40,7 +40,6 @@ func startFune(cfg *Config) (<-chan struct{}, error) {
 		ListenerType:   cfg.listenerType,
 	}
 
-	var a *funeagent.FuneAgent
 	a, err := funeagent.NewAgent(agentCfg)
 
 	if err != nil {
