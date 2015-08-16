@@ -1,7 +1,6 @@
 package emitter
 
 import (
-	"container/list"
 	"github.com/ainoya/fune/actions"
 	"github.com/ainoya/fune/listener"
 )
@@ -9,7 +8,7 @@ import (
 // Emitter listens events from `Listener`, and emits registered `Action`.
 type Emitter struct {
 	l       listener.Listener
-	actions *list.List
+	actions map[string]actions.Action
 }
 
 // NewEmitter returns instantiated `NewEmitter`.
@@ -22,7 +21,7 @@ func NewEmitter(l listener.Listener) *Emitter {
 }
 
 // LoadActions loads registered `Actions` into `Emitter.actions`
-func (e *Emitter) LoadActions(as *list.List) {
+func (e *Emitter) LoadActions(as map[string]actions.Action) {
 	e.actions = as
 }
 
@@ -48,8 +47,7 @@ func (e *Emitter) Stopped() chan struct{} {
 }
 
 func (e *Emitter) publishEvent(event interface{}) {
-	for elem := e.actions.Front(); elem != nil; elem = elem.Next() {
-		action := elem.Value.(actions.Action)
+	for _, action := range e.actions {
 		go func(a actions.Action) { a.Ch() <- event }(action)
 	}
 }

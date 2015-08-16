@@ -1,7 +1,6 @@
 package emitter
 
 import (
-	"container/list"
 	"fmt"
 	"github.com/ainoya/fune/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"github.com/ainoya/fune/actions"
@@ -22,7 +21,7 @@ func TestBroadCast(t *testing.T) {
 
 	e := NewEmitter(l)
 
-	e.actions = list.New()
+	e.actions = make(map[string]actions.Action)
 
 	msg := "message"
 	actionNum := 10
@@ -33,10 +32,12 @@ func TestBroadCast(t *testing.T) {
 
 	for i := 1; i <= actionNum; i++ {
 		go func(j int) {
-			a := actions.NewMockAction(fmt.Sprintf("receiver_%d", j))
-			e.actions.PushBack(
-				a,
-			)
+			actionName := fmt.Sprintf("receiver_%d", j)
+
+			a := actions.NewMockAction().(*actions.MockAction)
+			a.SetName(actionName)
+
+			e.actions[fmt.Sprintf("mock_%d", j)] = a
 			wg.Add(1)
 			defer wg.Done()
 			select {

@@ -12,7 +12,7 @@ var plog = capnslog.NewPackageLogger("github.com/ainoya/fune", "funemain")
 
 // Main sets up fune agent
 func Main() {
-	cfg := newConfig()
+	cfg := NewConfig()
 	err := cfg.Parse(os.Args[1:])
 	if err != nil {
 		plog.Errorf("error verifying flags, %v. See 'fune --help'.", err)
@@ -32,9 +32,13 @@ func Main() {
 	osutil.Exit(0)
 }
 
-// startEtcd launches the fune agent.
-func startFune(cfg *config) (<-chan struct{}, error) {
-	agentCfg := &funeagent.AgentConfig{}
+// startFune launches the fune agent.
+func startFune(cfg *Config) (<-chan struct{}, error) {
+	agentCfg := &funeagent.AgentConfig{
+		EnabledActions: cfg.enabledActions,
+		ActionsConfig:  cfg.actionsConfig,
+		ListenerType:   cfg.listenerType,
+	}
 
 	var a *funeagent.FuneAgent
 	a, err := funeagent.NewAgent(agentCfg)
@@ -48,7 +52,7 @@ func startFune(cfg *config) (<-chan struct{}, error) {
 	return a.StopNotify(), nil
 }
 
-func setupLogging(cfg *config) {
+func setupLogging(cfg *Config) {
 	capnslog.SetGlobalLogLevel(capnslog.INFO)
 	if cfg.debug {
 		capnslog.SetGlobalLogLevel(capnslog.DEBUG)
