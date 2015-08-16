@@ -5,6 +5,7 @@ import (
 	"github.com/ainoya/fune/Godeps/_workspace/src/github.com/fsouza/go-dockerclient"
 )
 
+// StdOutAction is action which outputs the events that are received from listener.
 type StdOutAction struct {
 	ch   chan interface{}
 	out  chan *docker.APIEvents

@@ -28,7 +28,7 @@ func TestBroadCast(t *testing.T) {
 	msg := "message"
 	actionNum := 10
 
-	var count uint64 = 0
+	var count uint64
 
 	var wg sync.WaitGroup
 

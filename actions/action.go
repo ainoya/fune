@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"github.com/ainoya/fune/listener"
 	"reflect"
 )
 
@@ -35,24 +36,34 @@ func (addr *ActionAddress) SetConfig(name, value string) {
 	}
 }
 
-var (
-	actions          map[string]Action
-	installedActions = make(map[string]*ActionAddress)
-)
+// repository is singleton to manage actions
+var repository = &ActionRepository{
+	EnabledActions:   make(map[string]Action),
+	InstalledActions: make(map[string]*ActionAddress),
+}
+
+// ActionRepository binds requirement variables for which manage actions
+type ActionRepository struct {
+	EnabledActions   map[string]Action
+	InstalledActions map[string]*ActionAddress
+	Listener         listener.Listener
+}
 
 // NewActions returns defined action list as singleton.
-func NewActions() map[string]Action {
-	if actions == nil {
-		actions = make(map[string]Action)
+func NewActions(listener listener.Listener) *ActionRepository {
+	if repository.EnabledActions == nil {
+		repository.EnabledActions = make(map[string]Action)
 	}
 
-	return actions
+	repository.Listener = listener
+
+	return repository
 }
 
 // InstallAction is called from every actions on `init()` functions,
 // and register information as action's list.
 func InstallAction(name string, action Action, newActionFunc func() Action) {
-	installedActions[name] = &ActionAddress{
+	repository.InstalledActions[name] = &ActionAddress{
 		NewFunc:     newActionFunc,
 		ConfigUnits: readConfigKeysFromAction(action),
 	}
@@ -75,8 +86,8 @@ func readConfigKeysFromAction(action Action) []*ConfigUnit {
 // EnableActions instantiates enabled actions specified by args.
 func EnableActions(targetActionNames []string) {
 	for _, actionName := range targetActionNames {
-		addr := installedActions[actionName]
-		// TODO : error handling when target action name was not found in installedActions
+		addr := repository.InstalledActions[actionName]
+		// TODO : error handling when target action name was not found in InstalledActions
 		if addr.NewFunc != nil {
 			RegisterAction(addr)
 		}
@@ -85,12 +96,12 @@ func EnableActions(targetActionNames []string) {
 
 // ClearActions removes all registered `actions`.
 func ClearActions() {
-	actions = nil
+	repository.EnabledActions = nil
 }
 
 // ApplyConfig applies map values parsed from commandline flags to actions.
 func ApplyConfig(actionsConfig map[string]string) {
-	for _, action := range actions {
+	for _, action := range repository.EnabledActions {
 		s := reflect.ValueOf(action).Elem()
 		typeOfT := s.Type()
 		for i := 0; i < s.NumField(); i++ {
@@ -104,11 +115,11 @@ func ApplyConfig(actionsConfig map[string]string) {
 	}
 }
 
-// ReadAllConfigKeys reads all `ConfigUnits` from `installedActions` and
+// ReadAllConfigKeys reads all `ConfigUnits` from `InstalledActions` and
 // return them as flatten array
 func ReadAllConfigKeys(label string) [](*ConfigUnit) {
 	var keys [](*ConfigUnit)
-	for _, action := range installedActions {
+	for _, action := range repository.InstalledActions {
 		keys = append(keys, action.ConfigUnits...)
 	}
 	return keys
@@ -118,18 +129,18 @@ func ReadAllConfigKeys(label string) [](*ConfigUnit) {
 func RegisterAction(addr *ActionAddress) {
 	a := addr.NewFunc()
 	a.Prepare()
-	actions[a.Name()] = a
+	repository.EnabledActions[a.Name()] = a
 }
 
 // Actions return action singleton
 // TODO : add error handling
 func Actions() map[string]Action {
-	return actions
+	return repository.EnabledActions
 }
 
 // ActivateActions runs all registered actions in `actions` as goroutine.
 func ActivateActions() {
-	for _, action := range actions {
+	for _, action := range repository.EnabledActions {
 		go processOn(action)
 	}
 }
@@ -145,6 +156,7 @@ func processOn(a Action) {
 
 // DeactivateActions closes all input channel of registered `actions` list.
 func DeactivateActions() {
+	actions := repository.EnabledActions
 	if actions != nil {
 		for _, action := range actions {
 			ch := action.Ch()

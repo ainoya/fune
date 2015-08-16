@@ -13,7 +13,7 @@ func TestSystemWithAllMock(t *testing.T) {
 	l := listener.NewMockListener()
 	l.StartListen()
 	e := emitter.NewEmitter(l)
-	as := actions.NewActions()
+	as := actions.NewActions(nil)
 
 	// Setup actions
 	addr := &actions.ActionAddress{
@@ -23,7 +23,7 @@ func TestSystemWithAllMock(t *testing.T) {
 	actions.ActivateActions()
 
 	// Load actions to Emitter
-	e.LoadActions(as)
+	e.LoadActions(as.EnabledActions)
 
 	// BroadCast message
 	e.BroadCast()
@@ -40,7 +40,7 @@ func TestSystemWithDockerEvents(t *testing.T) {
 	l := listener.NewMockListener()
 	l.StartProduceDockerEvents()
 	e := emitter.NewEmitter(l)
-	as := actions.NewActions()
+	as := actions.NewActions(nil).EnabledActions
 
 	// Setup actions
 	addr := &actions.ActionAddress{

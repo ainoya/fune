@@ -6,20 +6,20 @@ import (
 )
 
 func TestNewActions(t *testing.T) {
-	a := NewActions()
+	a := NewActions(nil)
 
-	assert.IsType(t, a, make(map[string]Action))
-	assert.Equal(t, a, Actions())
-	assert.Equal(t, a, actions)
+	assert.IsType(t, a, &ActionRepository{})
+	assert.Equal(t, a.EnabledActions, Actions())
+	assert.Equal(t, a, repository)
 
 	ClearActions()
 
-	assert.Nil(t, actions)
+	assert.Nil(t, repository.EnabledActions)
 	assert.Nil(t, Actions())
 }
 
 func TestRegisterAction(t *testing.T) {
-	NewActions()
+	NewActions(nil)
 
 	addr := &ActionAddress{
 		NewFunc: NewMockAction,
@@ -27,26 +27,26 @@ func TestRegisterAction(t *testing.T) {
 
 	RegisterAction(addr)
 
-	registered := actions["mock"]
+	registered := repository.EnabledActions["mock"]
 	assert.IsType(t, registered, NewMockAction())
 
 	ClearActions()
 }
 
 func TestInstallAction(t *testing.T) {
-	NewActions()
+	NewActions(nil)
 	actionName := "mock"
 
 	InstallAction(actionName, &MockAction{}, NewMockAction)
 
-	a := installedActions[actionName].NewFunc()
+	a := repository.InstalledActions[actionName].NewFunc()
 
 	assert.IsType(t, a, NewMockAction())
 	ClearActions()
 }
 
 func TestApplyConfig(t *testing.T) {
-	NewActions()
+	NewActions(nil)
 	actionName := "mock"
 
 	configKey := "mock-config-value"
@@ -70,7 +70,7 @@ func TestApplyConfig(t *testing.T) {
 
 	ApplyConfig(cfg)
 
-	registered := actions[actionName]
+	registered := repository.EnabledActions[actionName]
 
 	configured := registered.(*MockAction).ConfigValue
 
@@ -80,13 +80,13 @@ func TestApplyConfig(t *testing.T) {
 }
 
 func TestEnableActions(t *testing.T) {
-	NewActions()
+	NewActions(nil)
 	actionName := "mock"
 
 	InstallAction(actionName, &MockAction{}, NewMockAction)
 	EnableActions([]string{actionName})
 
-	enabled := actions[actionName]
+	enabled := repository.EnabledActions[actionName]
 
 	assert.IsType(t, enabled, NewMockAction())
 	ClearActions()
