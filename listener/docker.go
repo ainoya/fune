@@ -13,7 +13,7 @@ type DockerListener struct {
 	stopped chan struct{}
 }
 
-// NewDockerListener returns instantiated `DockerListner`
+// NewDockerListener returns instantiated `DockerListener`
 func NewDockerListener(c *docker.Client) *DockerListener {
 	l := &DockerListener{}
 	l.client = c
@@ -68,7 +68,7 @@ func (l *DockerListener) Stopped() chan struct{} {
 	return l.stopped
 }
 
-// Stop notifiies that DockerListner is closed as closing `l.stopped` channel.
+// Stop notifiies that DockerListener is closed as closing `l.stopped` channel.
 func (l *DockerListener) Stop() {
 	close(l.stopped)
 }

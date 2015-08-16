@@ -1,12 +1,13 @@
 package emitter
 
 import (
-	"container/list"
 	"fmt"
 	"github.com/ainoya/fune/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"github.com/ainoya/fune/actions"
 	"github.com/ainoya/fune/listener"
+	"strconv"
 	"sync"
+	"sync/atomic"
 	"testing"
 )
 
@@ -22,28 +23,33 @@ func TestBroadCast(t *testing.T) {
 
 	e := NewEmitter(l)
 
-	e.actions = list.New()
+	e.actions = make(map[string]actions.Action)
 
 	msg := "message"
 	actionNum := 10
 
-	count := 0
+	var count uint64 = 0
 
 	var wg sync.WaitGroup
 
+	// Prepare mock actions
 	for i := 1; i <= actionNum; i++ {
+		actionName := fmt.Sprintf("receiver_%d", i)
+		a := actions.NewMockAction().(*actions.MockAction)
+		a.SetName(actionName)
+
+		e.actions[fmt.Sprintf("mock_%d", i)] = a
+	}
+
+	for i := 1; i <= actionNum; i++ {
+		wg.Add(1)
 		go func(j int) {
-			a := actions.NewMockAction(fmt.Sprintf("receiver_%d", j))
-			e.actions.PushBack(
-				a,
-			)
-			wg.Add(1)
 			defer wg.Done()
 			select {
-			case e, ok := <-a.Ch():
+			case ev, ok := <-e.actions[fmt.Sprintf("mock_%d", j)].Ch():
 				if ok {
-					assert.Equal(t, e, msg, "received broadcasted message")
-					count++
+					assert.Equal(t, ev, msg, "received broadcasted message")
+					atomic.AddUint64(&count, 1)
 				}
 			}
 		}(i)
@@ -54,6 +60,9 @@ func TestBroadCast(t *testing.T) {
 	close(e.l.Stopped())
 
 	wg.Wait()
-	assert.Equal(t, actionNum, count, "All Actions received message")
 
+	expected := strconv.Itoa(actionNum)
+	actual := strconv.FormatUint(atomic.LoadUint64(&count), 10)
+
+	assert.Equal(t, expected, actual, "All Actions received message")
 }

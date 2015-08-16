@@ -16,8 +16,10 @@ func TestSystemWithAllMock(t *testing.T) {
 	as := actions.NewActions()
 
 	// Setup actions
-	a := actions.NewMockAction("system_test")
-	actions.RegisterAction(a)
+	addr := &actions.ActionAddress{
+		NewFunc: actions.NewMockAction,
+	}
+	actions.RegisterAction(addr)
 	actions.ActivateActions()
 
 	// Load actions to Emitter
@@ -27,9 +29,9 @@ func TestSystemWithAllMock(t *testing.T) {
 	e.BroadCast()
 
 	<-e.Stopped()
-	<-a.Stopped
+	<-actions.Actions()["mock"].(*actions.MockAction).Stopped
 
-	assert.Len(t, a.Memory, 10, "produced message size")
+	assert.Len(t, actions.Actions()["mock"].(*actions.MockAction).Memory, 10, "produced message size")
 
 	actions.ClearActions()
 }
@@ -41,8 +43,10 @@ func TestSystemWithDockerEvents(t *testing.T) {
 	as := actions.NewActions()
 
 	// Setup actions
-	a := actions.NewMockAction("system_test")
-	actions.RegisterAction(a)
+	addr := &actions.ActionAddress{
+		NewFunc: actions.NewMockAction,
+	}
+	actions.RegisterAction(addr)
 	actions.ActivateActions()
 
 	// Load actions to Emitter
@@ -52,11 +56,11 @@ func TestSystemWithDockerEvents(t *testing.T) {
 	e.BroadCast()
 
 	<-e.Stopped()
-	<-a.Stopped
+	<-actions.Actions()["mock"].(*actions.MockAction).Stopped
 
-	assert.Len(t, a.Memory, 10, "produced message size")
+	assert.Len(t, actions.Actions()["mock"].(*actions.MockAction).Memory, 10, "produced message size")
 
-	event := a.Memory[0].(*docker.APIEvents)
+	event := actions.Actions()["mock"].(*actions.MockAction).Memory[0].(*docker.APIEvents)
 
 	assert.Equal(t, event.From, "base:latest")
 
