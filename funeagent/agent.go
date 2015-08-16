@@ -74,7 +74,7 @@ func (a *FuneAgent) start() {
 func (a *FuneAgent) activate() {
 	a.listener.StartListen()
 
-	actions.NewActions()
+	actions.NewActions(a.listener)
 	actions.EnableActions(a.cfg.EnabledActions)
 	actions.ApplyConfig(a.cfg.ActionsConfig)
 	actions.ActivateActions()
