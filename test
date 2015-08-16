@@ -54,7 +54,7 @@ if [ -n "$INTEGRATION" ]; then
 fi
 
 echo "Checking gofmt..."
-fmtRes=$(gofmt -l $FMT)
+fmtRes=$(gofmt -l ${FMT})
 if [ -n "${fmtRes}" ]; then
 	echo -e "gofmt checking failed:\n${fmtRes}"
 	exit 255
@@ -69,7 +69,7 @@ fi
 
 if command -v go-nyet >/dev/null 2>&1; then
   echo "Checking go-nyet..."
-  nyetRes=$(go-nyet -exitWith 0 $FMT)
+  nyetRes=$(go-nyet -exitWith 0 ./...)
   if [ -n "${nyetRes}" ]; then
           echo -e "go-nyet checking failed:\n${nyetRes}"
           exit 255

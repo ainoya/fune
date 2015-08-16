@@ -5,7 +5,12 @@ build:
     - setup-go-workspace
     - golint
     - script:
+        name: install go-nyet
+        code: |-
+            go get github.com/barakmich/go-nyet
+
+    - script:
         name: run test
         code: |-
-            ./test
+            INTEGRATION=y ./test
 
