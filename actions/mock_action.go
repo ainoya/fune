@@ -31,6 +31,10 @@ func (a *MockAction) On() func(event interface{}) {
 	return f
 }
 
+// Prepare is dummy implementation of Action.
+func (a *MockAction) Prepare() {
+}
+
 // Ch returns value `ch` of struct `MockAction`.
 func (a *MockAction) Ch() chan interface{} {
 	return a.ch
