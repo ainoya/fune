@@ -72,3 +72,26 @@ func (l *DockerListener) Stopped() chan struct{} {
 func (l *DockerListener) Stop() {
 	close(l.stopped)
 }
+
+// ResolveIPPort gets "IP:Port" of container from container ID
+func (l *DockerListener) ResolveIPPort(e *docker.APIEvents) (*docker.Container, string, error) {
+	container, err := l.client.InspectContainer(e.ID)
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	portBindings := container.HostConfig.PortBindings
+
+	var ipPort string
+
+	for _, portBinding := range portBindings {
+		ipPort = fmt.Sprintf("%s:%s", portBinding[0].HostIP, portBinding[0].HostPort)
+		// TODO : error handling
+		break
+	}
+
+	// TODO : select port mapping more elastically
+
+	return container, ipPort, nil
+}

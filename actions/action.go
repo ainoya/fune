@@ -128,7 +128,6 @@ func ReadAllConfigKeys(label string) [](*ConfigUnit) {
 // RegisterAction registers defined action to `actions` list.
 func RegisterAction(addr *ActionAddress) {
 	a := addr.NewFunc()
-	a.Prepare()
 	repository.EnabledActions[a.Name()] = a
 }
 
@@ -141,6 +140,7 @@ func Actions() map[string]Action {
 // ActivateActions runs all registered actions in `actions` as goroutine.
 func ActivateActions() {
 	for _, action := range repository.EnabledActions {
+		action.Prepare()
 		go processOn(action)
 	}
 }
