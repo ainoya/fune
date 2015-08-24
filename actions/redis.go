@@ -37,7 +37,7 @@ func (a *RedisAction) Ch() chan interface{} {
 	return a.ch
 }
 
-// On returns functions that outputs to STDOUT.
+// On returns functions that register to redis
 func (a *RedisAction) On() func(event interface{}) {
 
 	f := func(e interface{}) {
@@ -74,6 +74,7 @@ func (a *RedisAction) Prepare() {
 	go a.setAddressToRedis(redis)
 }
 
+// setAddressToRedis adds FQDN and IP:Port of container pair to Redis.
 func (a *RedisAction) setAddressToRedis(redis *redis.Client) {
 	for {
 		e := <-a.out
@@ -83,10 +84,10 @@ func (a *RedisAction) setAddressToRedis(redis *redis.Client) {
 			case "start":
 				redis.Set(fmt.Sprintf("%s.%s", container.Name[1:], a.BaseDomain), ipPort, 0)
 				redis.Set(fmt.Sprintf("%s.%s", container.ID[0:7], a.BaseDomain), ipPort, 0)
-				fmt.Printf("start %s\n", a.RedisAddr)
+				fmt.Printf("[redis] start container %s\n", a.RedisAddr)
 			case "die":
 				redis.Del(container.Name, container.ID[0:7])
-				fmt.Printf("die \n")
+				fmt.Printf("[redis] die container \n")
 			}
 		}
 	}

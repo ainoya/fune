@@ -73,6 +73,7 @@ func (l *DockerListener) Stop() {
 	close(l.stopped)
 }
 
+// ResolveIPPort gets "IP:Port" of container from container ID
 func (l *DockerListener) ResolveIPPort(e *docker.APIEvents) (*docker.Container, string, error) {
 	container, err := l.client.InspectContainer(e.ID)
 
