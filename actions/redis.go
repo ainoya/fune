@@ -1,9 +1,10 @@
 package actions
 
 import (
+	"fmt"
 	"github.com/ainoya/fune/Godeps/_workspace/src/github.com/fsouza/go-dockerclient"
+	"github.com/ainoya/fune/Godeps/_workspace/src/gopkg.in/redis.v3"
 	"github.com/ainoya/fune/listener"
-	"gopkg.in/redis.v3"
 )
 
 // RedisAction is action which outputs the events that are received from listener.
@@ -17,13 +18,13 @@ type RedisAction struct {
 }
 
 // RedisActionName is used for identify name of itself.
-var RedisActionName = "stdout"
+var RedisActionName = "redis"
 
 // init function called once at launching program.
 // In init() function, InstallAction is called and registers itself
 // to `installedAction`
 func init() {
-	InstallAction(RedisActionName, &StdOutAction{}, NewStdOutAction)
+	InstallAction(RedisActionName, &RedisAction{}, NewRedisAction)
 }
 
 // Name returns value `name` of struct `RedisAction`.
@@ -69,6 +70,7 @@ func (a *RedisAction) Prepare() {
 			DB:       0,
 		},
 	)
+	fmt.Printf("redisAddr: %s\n", a.RedisAddr)
 	go a.setAddressToRedis(redis)
 }
 
@@ -78,11 +80,13 @@ func (a *RedisAction) setAddressToRedis(redis *redis.Client) {
 		container, ipPort, err := repository.Listener.(*listener.DockerListener).ResolveIPPort(e)
 		if err == nil {
 			switch e.Status {
-			case "create":
-				redis.Set(container.Name, ipPort, 0)
-				redis.Set(container.ID[0:7], ipPort, 0)
-			case "destroy":
+			case "start":
+				redis.Set(fmt.Sprintf("%s.%s", container.Name[1:], a.BaseDomain), ipPort, 0)
+				redis.Set(fmt.Sprintf("%s.%s", container.ID[0:7], a.BaseDomain), ipPort, 0)
+				fmt.Printf("start %s\n", a.RedisAddr)
+			case "die":
 				redis.Del(container.Name, container.ID[0:7])
+				fmt.Printf("die \n")
 			}
 		}
 	}
